@@ -1,0 +1,13 @@
+{
+    "api_key": "YOUR_ALPACA_API_KEY",
+    "api_secret": "YOUR_ALPACA_API_SECRET",
+    "base_url": "https://paper-api.alpaca.markets",
+    "symbols": ["SPY", "QQQ", "AAPL", "MSFT", "GOOGL", "AMZN", "NVDA", "COST", "TSLA"],
+    "strategy": "sma_crossover",
+    "check_interval": 60,
+    "position_size": 0.1,
+    "max_positions": 9,
+    "timeframe": "5Min",
+    "signal_mode": "position",
+    "use_margin": false
+}
