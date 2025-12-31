@@ -4,9 +4,57 @@ Live trading bot using Alpaca API.
 Supports paper trading (simulation) and live trading.
 
 Setup:
-1. Create account at https://alpaca.markets
-2. Get API keys from dashboard
-3. Set environment variables or create config.json
+    1. Create account at https://alpaca.markets
+    2. Get API keys from dashboard
+    3. Copy config.json.example to config.json and add your keys
+
+    # Create virtual environment
+    python3 -m venv venv
+    source venv/bin/activate
+
+    # Install dependencies
+    pip install alpaca-trade-api pandas numpy
+
+    # Copy config and add your API keys
+    cp config.json.example config.json
+
+Usage:
+    # Test connection and show account status
+    ./trader.py test
+
+    # Show account balance and positions
+    ./trader.py status
+
+    # Run bot continuously (executes trades based on strategy signals)
+    ./trader.py run
+
+    # Manual trading
+    ./trader.py buy -s AAPL -a 1000      # Buy $1000 of AAPL
+    ./trader.py buy -s AAPL -q 10        # Buy 10 shares of AAPL
+    ./trader.py sell -s AAPL             # Sell all AAPL shares
+    ./trader.py sell -s AAPL -q 5        # Sell 5 shares of AAPL
+    ./trader.py close -s AAPL            # Close AAPL position
+    ./trader.py close-all                # Close all positions
+
+Options:
+    --config, -c     Config file path (default: config.json)
+    --symbol, -s     Stock symbol for buy/sell/close
+    --qty, -q        Number of shares
+    --amount, -a     Dollar amount to invest
+    --strategy       Override strategy: sma_crossover, rsi, macd
+
+Config file options (config.json):
+    api_key          Alpaca API key
+    api_secret       Alpaca API secret
+    base_url         API endpoint (paper-api or api.alpaca.markets)
+    symbols          List of symbols to trade ["SPY", "AAPL", ...]
+    strategy         Trading strategy: sma_crossover, rsi, macd
+    check_interval   Seconds between strategy checks (default: 60)
+    position_size    Fraction of capital per trade (default: 0.1 = 10%)
+    max_positions    Maximum concurrent positions (default: 5)
+    timeframe        Bar timeframe: 1Min, 5Min, 15Min, 1Hour, 1Day
+    signal_mode      "crossover" (signal on cross) or "position" (fast>slow)
+    use_margin       Use margin buying power (default: false, safer)
 
 IMPORTANT: Start with paper trading. Never risk money you can't afford to lose.
 """

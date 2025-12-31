@@ -1,6 +1,47 @@
 #!/usr/bin/env python3
 """
-Simple backtesting framework for trading strategy experiments.
+Backtesting framework for trading strategy experiments.
+Tests strategies against historical data before using them live.
+
+Setup:
+    # Create virtual environment
+    python3 -m venv venv
+    source venv/bin/activate
+
+    # Install dependencies
+    pip install yfinance pandas numpy
+
+Usage:
+    # Run with default settings (tests all strategies on SPY 2022-2024)
+    ./backtest.py
+
+    # Or import and use programmatically:
+    from backtest import Backtester, fetch_data, sma_crossover
+
+    data = fetch_data("AAPL", "2023-01-01", "2024-01-01")
+    bt = Backtester(data, initial_capital=10000)
+    result = bt.run(lambda d: sma_crossover(d, fast=10, slow=30))
+    print(f"Return: {result.total_return:.2%}")
+
+Available strategies:
+    sma_crossover(data, fast=10, slow=30)
+        Buy when fast SMA crosses above slow SMA, sell on reverse cross.
+
+    rsi_strategy(data, period=14, oversold=30, overbought=70)
+        Buy when RSI < oversold, sell when RSI > overbought.
+
+    bollinger_bands(data, period=20, std_dev=2.0)
+        Buy at lower band, sell at upper band (mean reversion).
+
+Output metrics:
+    Total Return      Strategy's overall return
+    Buy & Hold        Return if you just held the stock
+    Outperformance    Strategy return minus buy-and-hold
+    Number of Trades  How many round-trip trades executed
+    Win Rate          Percentage of profitable trades
+    Max Drawdown      Largest peak-to-trough decline
+    Sharpe Ratio      Risk-adjusted return (higher = better)
+
 Educational purposes only - not financial advice.
 """
 
