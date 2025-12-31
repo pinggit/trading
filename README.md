@@ -4,6 +4,10 @@ Automated trading bot using Alpaca API with backtesting support.
 
 ## Setup
 
+1. Create free account at https://alpaca.markets
+2. Go to dashboard → Paper Trading → API Keys → Generate
+3. Clone and configure:
+
 ```bash
 # Create virtual environment
 python3 -m venv venv
@@ -14,7 +18,7 @@ pip install alpaca-trade-api yfinance pandas numpy
 
 # Configure API keys
 cp config.json.example config.json
-# Edit config.json with your Alpaca API keys
+# Edit config.json with your API key and secret from Alpaca dashboard
 ```
 
 ## Usage
