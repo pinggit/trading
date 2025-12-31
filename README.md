@@ -60,3 +60,26 @@ cp config.json.example config.json
 | signal_mode | crossover or position | position |
 
 Start with paper trading (`paper-api.alpaca.markets`). Not financial advice.
+
+
+# SP500 Buy/Hold/Sell
+
+Basing on 20/50/200 avg rate to grade each stock ,and suggest Buy/Hold/Sell
+
+## Setup
+
+1. Create free account at https://massive.com/
+2. Go to dashboard → get your API key
+3. Select one stock plan or options
+
+```bash
+# import your API key
+export MASSIVE_API_KEY='APIKEY'
+pip install tabulate colorama pandas numpy massive
+```
+
+
+### How to run
+```bash
+python3 sp_500_ana.py        
+```
