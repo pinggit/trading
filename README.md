@@ -81,5 +81,5 @@ pip install tabulate colorama pandas numpy massive
 
 ### How to run
 ```bash
-python3 sp_500_ana.py        
+python3 sp_500_ana.py 
 ```
