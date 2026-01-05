@@ -19,6 +19,8 @@ from io import StringIO
 from datetime import datetime, timedelta
 from tabulate import tabulate
 from colorama import init, Fore, Style
+from typing import Dict, List, Any
+import json
 import warnings
 
 warnings.filterwarnings('ignore')
@@ -218,6 +220,163 @@ class SP500ListFetcher:
     def refresh_list(cls, client: RESTClient = None) -> list[str]:
         return cls.get_sp500_list(use_cache=False, client=client)
 
+
+# ============================================
+# Config data from file
+# ============================================
+
+class ConfigManager:
+    """Manager for reading and accessing configuration from config.json"""
+    
+    def __init__(self, config_path: str = "config.json"):
+        """Initialize the config manager with the path to config.json
+        
+        Args:
+            config_path: Path to the config.json file (default: "config.json")
+        """
+        self.config_path = config_path
+        self.config = self.load_config()
+    
+    def load_config(self) -> Dict[str, Any]:
+        """Load configuration from JSON file
+        
+        Returns:
+            Dictionary containing all configuration values
+        """
+        try:
+            with open(self.config_path, 'r') as f:
+                config = json.load(f)
+            print(f"✓ Configuration loaded from {self.config_path}")
+            return config
+        except FileNotFoundError:
+            print(f"Error: {self.config_path} not found")
+            return {}
+        except json.JSONDecodeError as e:
+            print(f"Error: Invalid JSON in {self.config_path}: {e}")
+            return {}
+    
+    def get(self, key: str, default: Any = None) -> Any:
+        """Get a configuration value by key
+        
+        Args:
+            key: Configuration key to retrieve
+            default: Default value if key not found
+            
+        Returns:
+            Configuration value or default
+        """
+        return self.config.get(key, default)
+    
+    # Alpaca API credentials
+    @property
+    def api_key(self) -> str:
+        """Get Alpaca API key"""
+        return self.config.get('api_key', '')
+    
+    @property
+    def api_secret(self) -> str:
+        """Get Alpaca API secret"""
+        return self.config.get('api_secret', '')
+    
+    @property
+    def base_url(self) -> str:
+        """Get Alpaca base URL"""
+        return self.config.get('base_url', 'https://paper-api.alpaca.markets')
+    
+    # Trading symbols
+    @property
+    def symbols(self) -> List[str]:
+        """Get list of trading symbols"""
+        return self.config.get('symbols', [])
+    
+    # Strategy settings
+    @property
+    def strategy(self) -> str:
+        """Get trading strategy name"""
+        return self.config.get('strategy', 'sma_crossover')
+    
+    @property
+    def check_interval(self) -> int:
+        """Get check interval in seconds"""
+        return self.config.get('check_interval', 60)
+    
+    @property
+    def position_size(self) -> float:
+        """Get position size as fraction of portfolio"""
+        return self.config.get('position_size', 0.1)
+    
+    @property
+    def max_positions(self) -> int:
+        """Get maximum number of positions"""
+        return self.config.get('max_positions', 9)
+    
+    @property
+    def timeframe(self) -> str:
+        """Get timeframe for data (e.g., '5Min', '1Hour', '1Day')"""
+        return self.config.get('timeframe', '5Min')
+    
+    @property
+    def signal_mode(self) -> str:
+        """Get signal mode ('position' or other)"""
+        return self.config.get('signal_mode', 'position')
+    
+    @property
+    def use_margin(self) -> bool:
+        """Get whether to use margin trading"""
+        return self.config.get('use_margin', False)
+    
+    # Massive API
+    @property
+    def massive_api(self) -> str:
+        """Get Massive API key"""
+        return self.config.get('massive_api', '')
+    
+    @property
+    def long_term_stocks(self) -> List[str]:
+        """Get list of long-term stocks"""
+        return self.config.get('long_term_stocks', [])
+    
+    def save_config(self) -> bool:
+        """Save current configuration back to JSON file
+        
+        Returns:
+            True if successful, False otherwise
+        """
+        try:
+            with open(self.config_path, 'w') as f:
+                json.dump(self.config, f, indent=2)
+            print(f"✓ Configuration saved to {self.config_path}")
+            return True
+        except Exception as e:
+            print(f"Error saving config: {e}")
+            return False
+    
+    def update(self, key: str, value: Any) -> None:
+        """Update a configuration value
+        
+        Args:
+            key: Configuration key to update
+            value: New value
+        """
+        self.config[key] = value
+    
+    def display_config(self) -> None:
+        """Display all configuration values in a readable format"""
+        print("\n=== Configuration ===")
+        print(f"Alpaca API Key: {self.api_key[:10]}..." if self.api_key else "Not set")
+        print(f"Alpaca API Secret: {self.api_secret[:10]}..." if self.api_secret else "Not set")
+        print(f"Base URL: {self.base_url}")
+        print(f"Symbols: {', '.join(self.symbols)}")
+        print(f"Strategy: {self.strategy}")
+        print(f"Check Interval: {self.check_interval}s")
+        print(f"Position Size: {self.position_size * 100}%")
+        print(f"Max Positions: {self.max_positions}")
+        print(f"Timeframe: {self.timeframe}")
+        print(f"Signal Mode: {self.signal_mode}")
+        print(f"Use Margin: {self.use_margin}")
+        print(f"Massive API: {self.massive_api[:10]}..." if self.massive_api else "Not set")
+        print(f"Long-term Stocks: {', '.join(self.long_term_stocks) if self.long_term_stocks else 'None'}")
+        print("=" * 40)
 
 # ============================================
 # MASSIVE API DATA FETCHER
@@ -650,6 +809,9 @@ def main():
         print("  export MASSIVE_API_KEY='your_key_here'")
         return
     
+    #cfg data
+    obj=ConfigManager()
+
     # Initialize client
     try:
         client = RESTClient(api_key=MASSIVE_API_KEY)
@@ -661,9 +823,12 @@ def main():
     # Get S&P 500 list
     sp500 = SP500ListFetcher.get_sp500_list(client=client)
     
+    #Get personal list
+    personal_stock=obj.long_term_stocks
+
     while True:
         display_menu()
-        choice = input("\nChoice (1-7): ").strip()
+        choice = input("\nChoice (1-8): ").strip()
         
         if choice == '1':
             symbol = input("Stock symbol (e.g., AAPL): ").strip().upper()
@@ -701,6 +866,11 @@ def main():
                 compare_stocks(client, symbols)
         
         elif choice == '7':
+            scan_stocks(client, personal_stock, min(max(1, len(personal_stock)), len(personal_stock)))
+            pass
+
+                
+        elif choice == '8':
             print(f"\n{Fore.CYAN}Goodbye!{Style.RESET_ALL}")
             break
 
