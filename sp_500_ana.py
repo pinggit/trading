@@ -571,7 +571,8 @@ def display_menu():
     print("4. List by sector")
     print("5. Refresh stock list")
     print("6. Compare stocks")
-    print("7. Exit")
+    print("7. My list")
+    print("8. Exit")
 
 
 def scan_stocks(client: RESTClient, stocks: list[str], n: int = 10):
