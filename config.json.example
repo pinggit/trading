@@ -19,5 +19,17 @@
   "max_positions": 9,
   "timeframe": "5Min",
   "signal_mode": "position",
-  "use_margin": false
+  "use_margin": false,
+  "massive_api": "YOUR_MASSIVE_API_KEY",
+  "long_term_stocks": [
+    "SPY",
+    "QQQ",
+    "AAPL",
+    "MSFT",
+    "GOOGL",
+    "AMZN",
+    "NVDA",
+    "COST",
+    "TSLA"
+  ]
 }
